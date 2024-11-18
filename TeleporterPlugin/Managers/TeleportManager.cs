@@ -32,7 +32,7 @@ namespace TeleporterPlugin.Managers {
             var status = ActionManager.Instance()->GetActionStatus(ActionType.Action, 5);
             if (status != 0) {
                 var msg = GetLogMessage(status);
-                if(!string.IsNullOrEmpty(msg))
+                if (!string.IsNullOrEmpty(msg))
                     TeleporterPluginMain.LogChat(msg, true);
                 return false;
             }

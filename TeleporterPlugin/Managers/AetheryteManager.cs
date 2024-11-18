@@ -23,7 +23,7 @@ namespace TeleporterPlugin.Managers {
         public static void Load() {
             var lang = TeleporterPluginMain.Config.UseEnglish ? ClientLanguage.English : TeleporterPluginMain.ClientState.ClientLanguage;
             SetupAetherytes(AetheryteNames, lang);
-            //SetupMaps(TerritoryNames, lang);
+            SetupMaps(TerritoryNames, lang);
             SetupEstateIds(out m_EstateIds);
         }
 
@@ -57,14 +57,14 @@ namespace TeleporterPlugin.Managers {
                 var aetheryteName = GetAetheryteName(tpInfo);
 
                 var result = matchPartial && aetheryteName.Contains(name, StringComparison.OrdinalIgnoreCase);
-                if(!result && !aetheryteName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                if (!result && !aetheryteName.Equals(name, StringComparison.OrdinalIgnoreCase))
                     continue;
                 info = tpInfo;
                 return true;
             }
             return false;
         }
-        
+
         public static string GetAetheryteName(TeleportAlias alias) {
             return GetAetheryteName(new TeleportInfo {
                 AetheryteId = alias.AetheryteId,
@@ -79,13 +79,13 @@ namespace TeleporterPlugin.Managers {
                 return false;
             try {
                 var tp = Telepo.Instance();
-                if (tp->UpdateAetheryteList() == null) 
+                if (tp->UpdateAetheryteList() == null)
                     return false;
                 AvailableAetherytes.Clear();
                 for (long i = 0; i < tp->TeleportList.LongCount; i++)
                     AvailableAetherytes.Add(tp->TeleportList[i]);
                 return true;
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 AvailableAetherytes.Clear();
                 TeleporterPluginMain.PluginLog.Error(ex, "Error while Updating the Aetheryte List");
             }
@@ -134,7 +134,7 @@ namespace TeleporterPlugin.Managers {
             var sheet = TeleporterPluginMain.Data.GetExcelSheet<Aetheryte>(language)!;
             dict.Clear();
             foreach (var row in sheet) {
-                var name = row.PlaceName.Value.Name.ToString();
+                var name = row.PlaceName.ValueNullable?.Name.ToString();
                 if (string.IsNullOrEmpty(name))
                     continue;
                 name = TeleporterPluginMain.PluginInterface.Sanitizer.Sanitize(name);
@@ -143,10 +143,10 @@ namespace TeleporterPlugin.Managers {
         }
 
         private static void SetupMaps(IDictionary<uint, string> dict, ClientLanguage language) {
-            Lumina.Excel.ExcelSheet<Aetheryte> sheet = TeleporterPluginMain.Data.GetExcelSheet<Aetheryte>(language)!;
+            var sheet = TeleporterPluginMain.Data.GetExcelSheet<Aetheryte>(language)!;
             dict.Clear();
-            foreach (Aetheryte row in sheet) {
-                string name = row.Territory.Value.Name.ToString();
+            foreach (var row in sheet) {
+                var name = row.Territory.ValueNullable?.PlaceName.Value.Name.ToString();
                 if (string.IsNullOrEmpty(name))
                     continue;
                 if (row is not { IsAetheryte: true }) continue;
